@@ -1102,10 +1102,34 @@ func (c controller) CreateDevice(context *gin.Context) {
 		return
 	}
 
+	deviceType := context.PostForm("type")
+	if deviceType == "" {
+		context.AbortWithStatusJSON(
+			400, gin.H{
+				"message": "type is empty",
+			},
+		)
+		return
+	}
+
+	stateString := "{}"
+	switch deviceType {
+	case "light":
+		stateString = `{"status": "off", "lightness": 0}`
+	case "lock":
+		stateString = `{"status": "unlocked"}`
+	case "switch":
+		stateString = `{"status": "off"}`
+	case "sensor":
+		stateString = `{"value": 30}`
+	}
+
 	create := c.db.Create(
 		&Device{
 			Name:   name,
 			RoomID: room.ID,
+			Type:   deviceType,
+			State:  stateString,
 		},
 	)
 	if create.Error != nil {
