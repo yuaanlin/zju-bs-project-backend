@@ -8,7 +8,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 	"os"
 	"strconv"
 	"strings"
@@ -140,7 +139,6 @@ func (c controller) AuthMiddleware(context *gin.Context) {
 }
 
 type User struct {
-	gorm.Model
 	Username     string `json:"username" gorm:"primaryKey"`
 	Phone        string `json:"phone"`
 	PasswordHash string `json:"passwordHash"`
@@ -149,21 +147,18 @@ type User struct {
 }
 
 type Place struct {
-	gorm.Model
 	ID    uint   `gorm:"primaryKey" json:"id"`
 	Name  string `json:"name"`
 	Owner string `json:"owner"`
 }
 
 type Room struct {
-	gorm.Model
 	ID      uint   `gorm:"primaryKey" json:"id"`
 	Name    string `json:"name"`
 	PlaceID uint   `json:"placeId"`
 }
 
 type Device struct {
-	gorm.Model
 	ID        uint   `gorm:"primaryKey" json:"id"`
 	Name      string `json:"name"`
 	RoomID    uint   `json:"roomId"`
@@ -201,11 +196,7 @@ func New(sugar *zap.SugaredLogger) Controller {
 	}
 
 	dsn := mysqlUser + ":" + mysqlPass + "@tcp(" + mysqlHost + ":" + mysqlPort + ")/" + mysqlDatabase + "?charset=utf8mb4&parseTime=True&loc=Local"
-	db, err := gorm.Open(
-		mysql.Open(dsn), &gorm.Config{
-			Logger: logger.Default.LogMode(logger.Silent),
-		},
-	)
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic(err)
 	}
