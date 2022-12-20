@@ -1,0 +1,7 @@
+.idea
+.env
+tmp
+
+*.jpg
+*.png
+*.svg
